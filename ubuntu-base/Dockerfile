@@ -37,7 +37,7 @@ USER doe
 
 RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
 ENV ZSH_THEME avit
-ENV TERM xterm
+ENV TERM screen-256color
 
 COPY config/tmux/.tmux.conf /home/doe/
 COPY config/nvim/init.vim /home/doe/.config/nvim/
