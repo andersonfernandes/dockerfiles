@@ -16,23 +16,34 @@ RUN apt update && apt install -y \
       dpkg-dev \
       git \
       curl \
+      wget \
+      zsh \
       tmux
-
-RUN useradd -p $(openssl passwd -1 123456) -m -d /home/admin admin
-RUN usermod -aG sudo admin
 
 RUN add-apt-repository ppa:neovim-ppa/stable && apt update
 RUN apt install -y neovim
-RUN mkdir -p /home/admin/.config/nvim/
-COPY config/nvim/init.vim /home/admin/.config/nvim/
-RUN curl -fLo /home/admin/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+RUN curl -fLo /home/doe/.local/share/nvim/site/autoload/plug.vim --create-dirs \
       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-RUN mkdir /home/admin/workspace/
+RUN useradd -p $(openssl passwd -1 123456) -m -d /home/doe doe
+RUN usermod -aG sudo doe
+RUN chsh doe --shell /bin/zsh
 
-RUN chown -R admin /home/admin/
-USER admin
+RUN mkdir -p /home/doe/workspace/
+RUN mkdir -p /home/doe/.config/nvim/
+RUN chown -R doe /home/doe/
+
+USER doe
+
+RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
+ENV ZSH_THEME avit
+ENV TERM xterm
+
+COPY config/tmux/.tmux.conf /home/doe/
+COPY config/nvim/init.vim /home/doe/.config/nvim/
 
 RUN nvim +PlugInstall +qall > /dev/null
 
-WORKDIR /home/admin
+WORKDIR /home/doe
+
+CMD ["zsh"] 
